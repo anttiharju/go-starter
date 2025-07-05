@@ -25,6 +25,6 @@ jobs:
         with:
           token: ${{ steps.deploy.outputs.token }}
       - name: Deploy to GitHub Pages
-        uses: anttiharju/actions/mkdocs-gh-deploy@12254e74e7b1124f0a6c1553a30a480b73cda099
+        uses: anttiharju/actions/mkdocs-gh-deploy@9806aee2daa32397215f0d26dedea4dbe1904fff
         with:
           committer: "${{ github.actor }}[bot]"

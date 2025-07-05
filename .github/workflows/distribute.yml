@@ -44,13 +44,13 @@ jobs:
           gh release download "$TAG" --pattern '${{ github.event.repository.name }}-*64.tar.gz'
           ls -- *.tar.gz
       - name: Render formula template
-        uses: anttiharju/actions/render-template@12254e74e7b1124f0a6c1553a30a480b73cda099
+        uses: anttiharju/actions/render-template@9806aee2daa32397215f0d26dedea4dbe1904fff
         with:
           template: dist/brew/template.rb
           values: dist/brew/values.bash
           output: homebrew-tap/Formula/${{ github.event.repository.name }}.rb
       - name: Commit changes
-        uses: anttiharju/actions/commit-changes@12254e74e7b1124f0a6c1553a30a480b73cda099
+        uses: anttiharju/actions/commit-changes@9806aee2daa32397215f0d26dedea4dbe1904fff
         with:
           committer: "${{ github.actor }}[bot]"
           message: |
