@@ -1,3 +1,3 @@
 module github.com/anttiharju/go-starter
 
-go 1.24.3
+go 1.24.6
