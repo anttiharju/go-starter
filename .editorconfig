@@ -25,7 +25,7 @@ indent_size = unset
 indent_style = space
 indent_size = 2
 
-[*.json]
+[*.{json,jsonc}]
 indent_style = space
 indent_size = 2
 
@@ -42,5 +42,22 @@ indent_style = space
 indent_size = 4
 
 [*.py]
+indent_style = space
+indent_size = 4
+
+[**/.flox/env.json]
+insert_final_newline = false
+[**/.flox/env/manifest.lock]
+insert_final_newline = false
+
+[*.nix]
+indent_style = space
+indent_size = 2
+
+[*.rs]
+indent_style = space
+indent_size = 4
+
+[*.plist]
 indent_style = space
 indent_size = 4
