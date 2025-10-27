@@ -3,10 +3,10 @@ package cli
 import (
 	"context"
 
+	"github.com/anttiharju/go-starter/internal/buildinfo"
 	"github.com/anttiharju/go-starter/internal/exitcode"
-	"github.com/anttiharju/go-starter/internal/version"
 )
 
-func Start(_ context.Context, _ []string) exitcode.Exitcode {
-	return version.Print()
+func Start(_ context.Context, info buildinfo.BuildInfo, _ []string) exitcode.Exitcode {
+	return buildinfo.Print(info)
 }
