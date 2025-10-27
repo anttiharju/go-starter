@@ -1,3 +1,6 @@
+permissions:
+  contents: none
+  pull-requests: none
 on:
   push:
     branches:

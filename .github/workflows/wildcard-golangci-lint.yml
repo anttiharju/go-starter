@@ -1,3 +1,6 @@
+permissions:
+  contents: none
+  pull-requests: none
 on:
   push:
     branches:
@@ -6,6 +9,7 @@ on:
       - "**/*.go"
       - ".golangci-version"
       - ".golangci.yml"
+      - "go.*"
 
 jobs:
   wildcard:

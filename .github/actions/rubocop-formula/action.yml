@@ -4,14 +4,14 @@ description: "Run rubocop on the render formula"
 runs:
   using: "composite"
   steps:
+    - name: Install envsbust
+      uses: anttiharju/actions/install-envsubst@v0
     - name: Render out final formula
-      shell: bash
+      shell: sh
       env:
         GH_TOKEN: ${{ github.token }}
-        GH_REPO_NAME: ${{ github.event.repository.name }}
       run: |
-        ./dist/brew/render.bash
-        echo "RB_FILE=${GH_REPO_NAME//-/_}" >> $GITHUB_ENV
-    - uses: anttiharju/actions/rubocop-file@9806aee2daa32397215f0d26dedea4dbe1904fff
+        ./pkgs/render.sh brew
+    - uses: anttiharju/actions/rubocop-file@v0
       with:
-        file: "dist/brew/.${{ env.RB_FILE }}.rb"
+        file: "pkgs/brew/${{ github.event.repository.name }}.rb"

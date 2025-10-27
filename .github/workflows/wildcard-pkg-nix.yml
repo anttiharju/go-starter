@@ -1,9 +1,12 @@
+permissions:
+  contents: none
+  pull-requests: none
 on:
   push:
     branches:
       - wildcard
     paths:
-      - "dist/brew/**/*"
+      - "pkgs/nix/**/*"
 
 jobs:
   wildcard:

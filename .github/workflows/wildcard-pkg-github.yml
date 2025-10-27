@@ -6,9 +6,7 @@ on:
     branches:
       - wildcard
     paths:
-      - "internal/**/*"
-      - "*.go"
-      - "go.*"
+      - "pkgs/github/**/*"
 
 jobs:
   wildcard:

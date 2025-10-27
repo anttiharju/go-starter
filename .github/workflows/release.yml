@@ -1,4 +1,7 @@
 name: Release
+permissions:
+  contents: write
+  pull-requests: none
 on:
   workflow_call:
     inputs:
@@ -10,19 +13,16 @@ on:
         description: "Whether to trigger release workflows"
         value: ${{ jobs.github.outputs.tag }}
 
-permissions:
-  contents: write
-
 jobs:
   github:
     name: GitHub
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Create GitHub release
         id: release
-        uses: anttiharju/actions/release@9806aee2daa32397215f0d26dedea4dbe1904fff
+        uses: anttiharju/actions/release@v0
         with:
           type: ${{ inputs.type }}
       - name: Setup cache
@@ -34,7 +34,7 @@ jobs:
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
           cache: ${{ steps.cache.outputs.enabled }}
@@ -44,28 +44,28 @@ jobs:
           GOARCH: arm64
           version: ${{ steps.release.outputs.tag }}
         run: |
-          ./dist/github/release.bash "$version" "$GOOS" "$GOARCH"
+          ./pkgs/github/archive.sh "$version" "$GOOS" "$GOARCH"
       - name: Create linux-amd64 archive
         env:
           GOOS: linux
           GOARCH: amd64
           version: ${{ steps.release.outputs.tag }}
         run: |
-          ./dist/github/release.bash "$version" "$GOOS" "$GOARCH"
+          ./pkgs/github/archive.sh "$version" "$GOOS" "$GOARCH"
       - name: Create darwin-amd64 archive
         env:
           GOOS: darwin
           GOARCH: amd64
           version: ${{ steps.release.outputs.tag }}
         run: |
-          ./dist/github/release.bash "$version" "$GOOS" "$GOARCH"
+          ./pkgs/github/archive.sh "$version" "$GOOS" "$GOARCH"
       - name: Create linux-arm64 archive
         env:
           GOOS: linux
           GOARCH: arm64
           version: ${{ steps.release.outputs.tag }}
         run: |
-          ./dist/github/release.bash "$version" "$GOOS" "$GOARCH"
+          ./pkgs/github/archive.sh "$version" "$GOOS" "$GOARCH"
       - name: Upload archives to release
         env:
           GH_TOKEN: ${{ github.token }}

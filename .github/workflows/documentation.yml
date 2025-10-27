@@ -1,4 +1,7 @@
 name: Documentation
+permissions:
+  contents: none
+  pull-requests: none
 on:
   workflow_call:
     secrets:
@@ -16,15 +19,15 @@ jobs:
     steps:
       - name: Generate deploy token
         id: deploy
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.ANTTIHARJU_BOT_ID }}
           private-key: ${{ secrets.ANTTIHARJU_BOT_PRIVATE_KEY }}
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ steps.deploy.outputs.token }}
       - name: Deploy to GitHub Pages
-        uses: anttiharju/actions/mkdocs-gh-deploy@9806aee2daa32397215f0d26dedea4dbe1904fff
+        uses: anttiharju/actions/mkdocs-gh-deploy@v0
         with:
           committer: "${{ github.actor }}[bot]"
