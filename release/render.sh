@@ -31,7 +31,9 @@ export TAG="$tag" # also supplied by CI
 
 calculate_hash() {
   local file="$1"
-  shasum -a 256 "$file" | cut -d' ' -f1
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  hash=$(shasum -a 256 "$file" | cut -d' ' -f1)
+  echo "$branch-$hash"
 }
 
 # Check if values.sh changed
