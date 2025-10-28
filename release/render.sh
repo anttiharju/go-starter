@@ -41,6 +41,8 @@ if [[ -f "$hash_cache" ]]; then
   current_hash=$(calculate_hash "$pkg/values.sh")
   previous_hash=$(cat "$hash_cache")
   [[ "$current_hash" != "$previous_hash" ]] && export NO_CACHE=1
+else
+  export NO_CACHE=1
 fi
 
 # Render
