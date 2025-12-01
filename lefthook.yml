@@ -13,6 +13,17 @@ pre-push:
 pre-commit:
   parallel: true
   jobs:
+    - name: go build
+      glob: "{internal/*,go.*,*.go}"
+      run: go build
+
+    - name: golangci-lint
+      glob: "{flake.lock,.golangci.yml,*.go}"
+      run: |
+        golangci-lint fmt
+        golangci-lint run --fix
+      stage_fixed: true
+
     # action-validator does not play well with nix-direnv (it scans all files instead of ones in version control)
     # - name: action-validator
     #   run: git ls-files -z '.github/workflows/*.yml' '*/action.yml' | xargs --null action-validator --verbose
@@ -27,17 +38,6 @@ pre-commit:
 
     - name: editorconfig-checker
       run: editorconfig-checker {staged_files}
-
-    - name: go build
-      glob: "{internal/*,go.*,*.go}"
-      run: go build
-
-    - name: golangci-lint
-      glob: "{flake.lock,.golangci.yml,*.go}"
-      run: |
-        golangci-lint fmt
-        golangci-lint run --fix
-      stage_fixed: true
 
     - name: Keep .yml
       glob: "*.yaml"
