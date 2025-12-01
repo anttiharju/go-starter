@@ -60,3 +60,6 @@ tmp
 # Nix
 .direnv
 !flake.lock
+
+# Release automation
+release

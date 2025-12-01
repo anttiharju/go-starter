@@ -2,8 +2,7 @@
   description = "Go development environment";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.11";
     nur-anttiharju.url = "github:anttiharju/nur-packages";
     nur-anttiharju.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -12,7 +11,6 @@
     {
       self,
       nixpkgs,
-      nixpkgs-unstable,
       nur-anttiharju,
       ...
     }:
@@ -27,7 +25,7 @@
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
 
       devPackages =
-        pkgs: pkgs-unstable: anttiharju: system: with pkgs; [
+        pkgs: anttiharju: system: with pkgs; [
           go
           action-validator
           actionlint
@@ -39,7 +37,7 @@
               mkdocs-material
             ]
           ))
-          pkgs-unstable.prettier
+          prettier
           rubocop
           shellcheck
           gh
@@ -65,12 +63,11 @@
         system:
         let
           pkgs = import nixpkgs { inherit system; };
-          pkgs-unstable = import nixpkgs-unstable { inherit system; };
           anttiharju = nur-anttiharju.packages.${system};
         in
         {
           default = pkgs.mkShell {
-            packages = devPackages pkgs pkgs-unstable anttiharju system;
+            packages = devPackages pkgs anttiharju system;
 
             shellHook = "lefthook install";
           };
@@ -81,7 +78,6 @@
         system:
         let
           pkgs = import nixpkgs { inherit system; };
-          pkgs-unstable = import nixpkgs-unstable { inherit system; };
           anttiharju = nur-anttiharju.packages.${system};
 
           # Fix not being able to run the unpatched node binaries that GitHub Actions mounts into the container
@@ -94,12 +90,13 @@
           ci = pkgs.dockerTools.streamLayeredImage {
             name = "ci";
             tag = container_version;
-            contents = (devPackages pkgs pkgs-unstable anttiharju system) ++ [
+            contents = (devPackages pkgs anttiharju system) ++ [
               nix-ld-setup
               pkgs.dockerTools.caCertificates
               pkgs.sudo
               pkgs.nix.out
               pkgs.dockerTools.usrBinEnv
+              anttiharju.compare-changes
             ];
             config = {
               User = "1001"; # https://github.com/actions/runner/issues/2033#issuecomment-1598547465
