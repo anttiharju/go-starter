@@ -3,15 +3,16 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-version="$1"
+tag="$1"
 os="$2"
 arch="$3"
-echo "$0 $version $os $arch"
+target="$os-$arch"
+echo "$0 $tag $os $arch"
 
-rm -rf "tmp/$os-$arch"
+rm -rf "tmp/$target"
 remote_url="$(git remote get-url origin)"
 repo="$(basename --suffix .git "$remote_url")"
-CGO_ENABLED=0 go build -ldflags "-s -w -buildid=github-$version" -trimpath -o "tmp/$os-$arch/$repo"
+CGO_ENABLED=0 go build -ldflags "-s -w -buildid=github-$tag" -trimpath -o "tmp/$target/$repo"
 
-cd "tmp/$os-$arch"
-tar -czf "$repo_root/$repo-$os-$arch.tar.gz" "$repo"
+cd "tmp/$target"
+tar -czf "$repo_root/$repo-$target.tar.gz" "$repo"
