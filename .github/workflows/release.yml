@@ -36,7 +36,7 @@ jobs:
           app-id: ${{ secrets.ANTTIHARJU_BOT_ID }}
           private-key: ${{ secrets.ANTTIHARJU_BOT_PRIVATE_KEY }}
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ steps.deploy.outputs.token }}
       - name: Deploy to GitHub Pages
@@ -58,7 +58,7 @@ jobs:
         password: ${{ github.token }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Generate commit token
         id: generate-token
         uses: actions/create-github-app-token@v2
@@ -67,27 +67,29 @@ jobs:
           private-key: ${{ secrets.ANTTIHARJU_BOT_PRIVATE_KEY }}
           repositories: nur-packages
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: anttiharju/nur-packages
           token: ${{ steps.generate-token.outputs.token }}
           path: nur-packages
+      - working-directory: nur-packages
+        run: nix flake update
       - name: Source values and render template # TODO: use release/render.sh for this, needs output param
         env:
           TAG: "v${{ inputs.version }}" # nix/values.sh expects TAG variable
           GH_TOKEN: ${{ github.token }} # values script may use gh cli that needs this
-          output: nur-packages/pkgs/${{ github.event.repository.name }}/default.nix
+          output: nur-packages/pkgs/${{ github.event.repository.name }}
         run: |
           source .release/nix/values.sh
-          mkdir -p "$(dirname "$output")"
-          envsubst -i .release/nix/template.nix -no-unset -no-empty > "$output"
+          mkdir -p "$output"
+          envsubst -i .release/nix/template.nix -no-unset -no-empty > "$output/default.nix"
       - name: Commit changes
         uses: anttiharju/actions/commit-changes@v0
         with:
           working-directory: nur-packages
-          committer: "${{ github.actor }}[bot]"
+          committer: ${{ github.actor }}
           message: |
-            Update ${{ github.event.repository.name }} to ${{ inputs.version }}
+            ${{ github.event.repository.name }} ${{ inputs.version }}
 
             https://github.com/${{ github.repository }}/blob/${{ github.sha }}/.github/workflows/release.yml
 
@@ -100,10 +102,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ github.token }}
     env:
-      tag: "v${{ inputs.version }}" # Go expects version tags to be prefixed with "v"
+      tag: "v${{ inputs.version }}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Tag current commit
         shell: sh
         run: |
@@ -140,8 +142,17 @@ jobs:
         run: |
           git push origin "$tag"
           gh release create "$tag" --title="$title" --generate-notes --draft
-          find . -maxdepth 1 -name '${{ github.event.repository.name }}-*-*.tar.gz' -exec gh release upload "$tag" {} \;
+          find . -maxdepth 1 -name '${{ github.event.repository.name }}-*.tar.gz' -exec gh release upload "$tag" {} \;
           gh release edit "$tag" --draft=false
+      - name: Tag major version
+        shell: sh
+        env:
+          version: ${{ inputs.version }}
+        run: |
+          major_version=$(echo "$version" | cut -d. -f1)
+          major_tag="v$major_version"
+          git tag "$major_tag"
+          git push origin "$major_tag" --force
 
   homebrew-tap:
     name: Homebrew
@@ -154,7 +165,7 @@ jobs:
         password: ${{ github.token }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Generate commit token
         id: generate-token
         uses: actions/create-github-app-token@v2
@@ -163,19 +174,16 @@ jobs:
           private-key: ${{ secrets.ANTTIHARJU_BOT_PRIVATE_KEY }}
           repositories: homebrew-tap
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: anttiharju/homebrew-tap
           token: ${{ steps.generate-token.outputs.token }}
           path: homebrew-tap
-      - name: Output name with underscores
-        id: underscore
-        uses: ./.github/actions/underscore-name
       - name: Source values and render template # TODO: use release/render.sh for this, needs output param
         env:
           TAG: "v${{ inputs.version }}" # brew/values.sh expects TAG variable
           GH_TOKEN: ${{ github.token }} # values script may use gh cli that needs this
-          output: homebrew-tap/Formula/${{ steps.underscore.outputs.filename }}.rb
+          output: homebrew-tap/Formula/${{ github.event.repository.name }}.rb
         run: |
           source .release/brew/values.sh
           mkdir -p "$(dirname "$output")"
@@ -184,8 +192,8 @@ jobs:
         uses: anttiharju/actions/commit-changes@v0
         with:
           working-directory: homebrew-tap
-          committer: "${{ github.actor }}[bot]"
+          committer: ${{ github.actor }}
           message: |
-            Update ${{ github.event.repository.name }} to ${{ inputs.version }}
+            ${{ github.event.repository.name }} ${{ inputs.version }}
 
             https://github.com/${{ github.repository }}/blob/${{ github.sha }}/.github/workflows/release.yml
