@@ -45,7 +45,7 @@ nur-packages
 .release/nix/*.nix
 !.release/*/template.*
 
-# Binary archives
+# Archives
 *.tar.gz
 
 # Packaging happens under this directory
