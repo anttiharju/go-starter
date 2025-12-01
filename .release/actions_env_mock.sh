@@ -10,7 +10,6 @@ temp="${normalized_url%/*}"
 owner="$(basename "$temp")"
 
 repo="$(basename --suffix .git "$remote_url")"
-
 export GITHUB_REPOSITORY="$owner/$repo"
 
 if [[ "$TAG" = "v0.0.0" ]]; then
