@@ -10,7 +10,7 @@ echo "./.release/github/archive.sh $version $os $arch"
 
 rm -rf "tmp/$os-$arch"
 remote_url="$(git remote get-url origin)"
-repo="$(basename -s .git "$remote_url")"
+repo="$(basename --suffix .git "$remote_url")"
 CGO_ENABLED=0 go build -ldflags "-s -w -buildid=github-$version" -trimpath -o "tmp/$os-$arch/$repo"
 
 cd "tmp/$os-$arch"
