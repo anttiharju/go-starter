@@ -129,7 +129,6 @@ jobs:
 
       - if: always() && !cancelled() && (steps.changed.outputs.go == 'true' || github.event_name == 'push')
         name: go test
-        shell: sh
         run: |
           go test ./...
 

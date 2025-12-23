@@ -108,7 +108,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Tag current commit
-        shell: sh
         run: |
           git tag "$tag"
       - name: Create darwin-amd64 archive
@@ -136,7 +135,6 @@ jobs:
         run: |
           ./.release/archive.sh "$tag" "$GOOS" "$GOARCH"
       - name: Release
-        shell: sh
         env:
           GH_TOKEN: ${{ github.token }}
           title: ${{ inputs.version }}
