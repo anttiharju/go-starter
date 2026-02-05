@@ -8,7 +8,7 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      cargo:
+      gomod:
         patterns:
           - "*"
   - package-ecosystem: "github-actions"
